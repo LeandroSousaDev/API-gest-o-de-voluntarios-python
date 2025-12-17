@@ -1,4 +1,4 @@
-from datetime import datetime, UTC
+from datetime import datetime
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -26,10 +26,11 @@ def lista_de_usuarios(status: str = None, cargo : str = None, disponibilidade: s
         return db.query(VoluntariosModel).all()
 
 @router.post("/",status_code=status.HTTP_201_CREATED)
-def novo_voluntario(voluntario: VoluntariosRequest, db: Session = Depends(get_db)):
+def registro_de_voluntario(voluntario: VoluntariosRequest, db: Session = Depends(get_db)):
 
-    current_voluntario = db.query(VoluntariosModel).filter_by(email=voluntario.email).first()
-    if current_voluntario:
+
+    voluntario_atual = db.query(VoluntariosModel).filter_by(email=voluntario.email).first()
+    if voluntario_atual:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="esse email ja esta cadastrado")
 
     novo_voluntario = VoluntariosModel(
@@ -39,7 +40,7 @@ def novo_voluntario(voluntario: VoluntariosRequest, db: Session = Depends(get_db
         cargo_pretendido=voluntario.cargo_pretendido,
         disponibilidade=voluntario.disponibilidade,
         status=StatusEnum.ATIVO,
-        criado_em=datetime.now(UTC)
+        criado_em=datetime.now()
     )
     db.add(novo_voluntario)
     db.commit()
@@ -59,64 +60,64 @@ def novo_voluntario(voluntario: VoluntariosRequest, db: Session = Depends(get_db
 @router.get("/{id_voluntario}", response_model=VoluntariosResponse, status_code=status.HTTP_200_OK)
 def buscar_voluntario(id_voluntario: str, db: Session = Depends(get_db)):
 
-    current_voluntario = db.query(VoluntariosModel).get(id_voluntario)
+    voluntario_atual = db.query(VoluntariosModel).get(id_voluntario)
 
-    if current_voluntario is None:
+    if voluntario_atual is None:
         raise HTTPException(status_code=404, detail="item não encontrado")
 
     return VoluntariosResponse(
-        id=current_voluntario.id,
-        nome=current_voluntario.nome,
-        email=current_voluntario.email,
-        telefone=current_voluntario.telefone,
-        cargo_pretendido=current_voluntario.cargo_pretendido,
-        disponibilidade=current_voluntario.disponibilidade,
-        status=current_voluntario.status,
-        criado_em=current_voluntario.criado_em
+        id=voluntario_atual.id,
+        nome=voluntario_atual.nome,
+        email=voluntario_atual.email,
+        telefone=voluntario_atual.telefone,
+        cargo_pretendido=voluntario_atual.cargo_pretendido,
+        disponibilidade=voluntario_atual.disponibilidade,
+        status=voluntario_atual.status,
+        criado_em=voluntario_atual.criado_em
     )
 
 
 @router.put("/{id_voluntario}", status_code=status.HTTP_200_OK)
 def atualizar_voluntario(id_voluntario: int, voluntario: VoluntariosRequest, db: Session = Depends(get_db)) ->VoluntariosResponse:
 
-    current_voluntario = db.query(VoluntariosModel).get(id_voluntario)
+    voluntario_atual = db.query(VoluntariosModel).get(id_voluntario)
 
-    if current_voluntario is None:
+    if voluntario_atual is None:
         raise HTTPException(status_code=404, detail="item não encontrado")
 
-    current_voluntario.nome = voluntario.nome
-    current_voluntario.email = voluntario.email
-    current_voluntario.telefone = voluntario.telefone
-    current_voluntario.cargo_pretendido = voluntario.cargo_pretendido
-    current_voluntario.disponibilidade = voluntario.disponibilidade
+    voluntario_atual.nome = voluntario.nome
+    voluntario_atual.email = voluntario.email
+    voluntario_atual.telefone = voluntario.telefone
+    voluntario_atual.cargo_pretendido = voluntario.cargo_pretendido
+    voluntario_atual.disponibilidade = voluntario.disponibilidade
 
-    db.add(current_voluntario)
+    db.add(voluntario_atual)
     db.commit()
-    db.refresh(current_voluntario)
+    db.refresh(voluntario_atual)
 
     return VoluntariosResponse(
-        id=current_voluntario.id,
-        nome=current_voluntario.nome,
-        email=current_voluntario.email,
-        telefone=current_voluntario.telefone,
-        cargo_pretendido=current_voluntario.cargo_pretendido,
-        disponibilidade=current_voluntario.disponibilidade,
-        status=current_voluntario.status,
-        criado_em=current_voluntario.criado_em
+        id=voluntario_atual.id,
+        nome=voluntario_atual.nome,
+        email=voluntario_atual.email,
+        telefone=voluntario_atual.telefone,
+        cargo_pretendido=voluntario_atual.cargo_pretendido,
+        disponibilidade=voluntario_atual.disponibilidade,
+        status=voluntario_atual.status,
+        criado_em=voluntario_atual.criado_em
     )
 
 @router.delete("/{id_voluntario}", status_code=status.HTTP_204_NO_CONTENT)
 def deletar_voluntario(id_voluntario: int, db: Session = Depends(get_db)) -> None:
 
-    current_voluntario = db.query(VoluntariosModel).get(id_voluntario)
+    voluntario_atual = db.query(VoluntariosModel).get(id_voluntario)
 
-    if current_voluntario is None:
+    if voluntario_atual is None:
         raise HTTPException(status_code=404, detail="item não encontrado")
 
-    current_voluntario.status = StatusEnum.INATIVO
-    db.add(current_voluntario)
+    voluntario_atual.status = StatusEnum.INATIVO
+    db.add(voluntario_atual)
     db.commit()
-    db.refresh(current_voluntario)
+    db.refresh(voluntario_atual)
 
     return None
 
