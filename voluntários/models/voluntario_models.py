@@ -1,4 +1,6 @@
-from sqlalchemy import Integer, String
+from datetime import datetime
+
+from sqlalchemy import Integer, String, DateTime
 from sqlalchemy.orm import Mapped
 from sqlalchemy.testing.schema import mapped_column
 
@@ -14,3 +16,4 @@ class VoluntariosModel(Base):
     cargo_pretendido: Mapped[str] = mapped_column(String(100), nullable=False)
     disponibilidade: Mapped[str] = mapped_column(String(100), nullable=False)
     status: Mapped[str] = mapped_column(String(100), nullable=False)
+    criado_em: Mapped[datetime] = mapped_column(DateTime, nullable=False)

@@ -1,3 +1,4 @@
+from datetime import datetime, UTC
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -38,6 +39,7 @@ def novo_voluntario(voluntario: VoluntariosRequest, db: Session = Depends(get_db
         cargo_pretendido=voluntario.cargo_pretendido,
         disponibilidade=voluntario.disponibilidade,
         status=StatusEnum.ATIVO,
+        criado_em=datetime.now(UTC)
     )
     db.add(novo_voluntario)
     db.commit()
@@ -51,6 +53,7 @@ def novo_voluntario(voluntario: VoluntariosRequest, db: Session = Depends(get_db
         cargo_pretendido=novo_voluntario.cargo_pretendido,
         disponibilidade=voluntario.disponibilidade,
         status=novo_voluntario.status,
+        criado_em=novo_voluntario.criado_em
     )
 
 @router.get("/{id_voluntario}", response_model=VoluntariosResponse, status_code=status.HTTP_200_OK)
@@ -69,6 +72,7 @@ def buscar_voluntario(id_voluntario: str, db: Session = Depends(get_db)):
         cargo_pretendido=current_voluntario.cargo_pretendido,
         disponibilidade=current_voluntario.disponibilidade,
         status=current_voluntario.status,
+        criado_em=current_voluntario.criado_em
     )
 
 
@@ -85,7 +89,6 @@ def atualizar_voluntario(id_voluntario: int, voluntario: VoluntariosRequest, db:
     current_voluntario.telefone = voluntario.telefone
     current_voluntario.cargo_pretendido = voluntario.cargo_pretendido
     current_voluntario.disponibilidade = voluntario.disponibilidade
-    current_voluntario.status = voluntario.status
 
     db.add(current_voluntario)
     db.commit()
@@ -99,6 +102,7 @@ def atualizar_voluntario(id_voluntario: int, voluntario: VoluntariosRequest, db:
         cargo_pretendido=current_voluntario.cargo_pretendido,
         disponibilidade=current_voluntario.disponibilidade,
         status=current_voluntario.status,
+        criado_em=current_voluntario.criado_em
     )
 
 @router.delete("/{id_voluntario}", status_code=status.HTTP_204_NO_CONTENT)

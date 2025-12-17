@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 
 from pydantic import BaseModel
@@ -11,6 +12,7 @@ class VoluntariosResponse(BaseModel):
     cargo_pretendido: str
     disponibilidade: str
     status: str
+    criado_em: datetime
 
 class VoluntariosRequest(BaseModel):
     nome: str
